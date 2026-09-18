@@ -7,6 +7,10 @@ on:
       - "**/*.tf"
       - ".tflint.hcl"
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   terraform-check:
     runs-on: ubuntu-latest
@@ -17,12 +21,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::151963020978:role/github-actions-terraform-ci
+          aws-region: us-east-1
+
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.9.0"
 
       - run: terraform fmt -check -recursive
-      - run: terraform init -backend=false
+      - run: terraform init
       - run: terraform validate
 
       - uses: terraform-linters/setup-tflint@v4
@@ -34,4 +44,3 @@ jobs:
           tflint --config=${{ github.workspace }}/.tflint.hcl
 
       - run: terraform plan -no-color
-        continue-on-error: true
