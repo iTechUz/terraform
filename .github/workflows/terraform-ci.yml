@@ -1,0 +1,37 @@
+name: Terraform CI
+
+on:
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "**/*.tf"
+      - ".tflint.hcl"
+
+jobs:
+  terraform-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 1.EC2
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.0"
+
+      - run: terraform fmt -check -recursive
+      - run: terraform init -backend=false
+      - run: terraform validate
+
+      - uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+
+      - run: |
+          tflint --init --config=${{ github.workspace }}/.tflint.hcl
+          tflint --config=${{ github.workspace }}/.tflint.hcl
+
+      - run: terraform plan -no-color
+        continue-on-error: true
