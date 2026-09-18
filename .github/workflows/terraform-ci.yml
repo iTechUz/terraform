@@ -30,7 +30,7 @@ jobs:
           tflint_version: latest
 
       - run: |
-          tflint --init
+          tflint --init --config=${{ github.workspace }}/.tflint.hcl
           tflint --config=${{ github.workspace }}/.tflint.hcl
 
       - run: terraform plan -no-color
