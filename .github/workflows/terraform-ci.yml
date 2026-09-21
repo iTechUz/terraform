@@ -6,11 +6,13 @@ on:
     paths:
       - "**/*.tf"
       - ".tflint.hcl"
+      - ".github/workflows/terraform-ci.yml"
   push:
     branches: [ "main" ]
     paths:
       - "**/*.tf"
       - ".tflint.hcl"
+      - ".github/workflows/terraform-ci.yml"
 
 permissions:
   id-token: write
